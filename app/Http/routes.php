@@ -14,3 +14,10 @@
 $app->get('/', function () use ($app) {
     return $app->version();
 });
+
+$app->get('/drummers', 'DrummersController@index');
+$app->get('/drummers/{id:[\d]+}', [
+		'as' => 'drummers.show',
+		'uses' => 'DrummersController@show'
+	]);
+$app->post('/drummers','DrummersController@store');
