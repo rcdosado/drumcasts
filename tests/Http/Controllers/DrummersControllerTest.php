@@ -118,14 +118,110 @@ class DrummersControllerTest extends TestCase
             ->seeHeaderWithRegExp('Location', '#/drummers/[\d]+$#');
             
     }
+ 
+    /**
+     * @test
+     * 
+     */
+    public function update_should_only_change_fillable_fields() 
+    {
+
+        $this->notSeeInDatabase('drummers', [
+                'lastname' => 'peart'
+            ]);
+
+        $this->put('/drummers/1',[
+                'id' => 5,
+                'firstname' => 'Neil',
+                'middlename' => 'Ellwood',
+                'lastname' => 'Peart',
+                'genre' => 'Progressive Rock'
+            ]);
+
+        $this->seeStatusCode(200)
+             ->seeJson([
+                    'id' => 1,
+                    'firstname' => 'Neil',
+                    'middlename' => 'Ellwood',
+                    'lastname' => 'Peart',
+                    'genre' => 'Progressive Rock'
+                ])
+             ->seeInDatabase('drummers',[
+                    'lastname' => 'Peart'
+                ]);
+    }
+
+
+    /**
+     * @test
+     * 
+     */
+    public function update_should_fail_with_an_invalid_id() {
+
+      $this->put('/drummers/9999999999')
+           ->seeStatusCode(404)
+           ->seeJsonEquals([
+                'error' => [
+                    'message' => 'Drummer not found'
+                ]
+            ]);
+    }
+
+    /**
+     * @test
+     * 
+     */
+    public function update_should_not_match_an_invalid_route() {
+
+        $this->put('/drummers/this-is-invalid')
+             ->seeStatusCode(404);
+    }
+
+    /**
+     * @test
+     * 
+     */
+    public function destroy_should_remove_a_valid_drummer() {
+
+        $this->delete('/drummers/1')
+            ->seeStatusCode(204)
+            ->isEmpty();
+
+        $this->notSeeInDatabase('drummers', ['id'=>1]);
+    }
+
+    /**
+     * @test
+     * 
+     */
+    public function destroy_should_return_a_404_with_an_invalid_id() {
+
+        $this->delete('/drummers/99999')
+            ->seeStatusCode(404)
+            ->seeJsonEquals([
+                    'error' => [
+                        'message' => 'Drummer not found'
+                    ]
+            ]);
+    }
+
+    /**
+      *
+      * @test
+      *
+      */
+
+    public function destroy_should_not_match_an_invalid_route()
+    {
+            $this->delete('/drummers/this-is-invalid')
+                ->seeStatusCode(404);
+                
+    }
+      
+
+
 
 
 
 }
-
-
-
-
-    
-
 

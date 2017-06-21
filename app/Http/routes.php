@@ -21,3 +21,7 @@ $app->get('/drummers/{id:[\d]+}', [
 		'uses' => 'DrummersController@show'
 	]);
 $app->post('/drummers','DrummersController@store');
+$app->put('/drummers/{id:[\d]+}', 'DrummersController@update');
+$app->delete('/drummers/{id:[\d]+}', 'DrummersController@destroy');
+
+

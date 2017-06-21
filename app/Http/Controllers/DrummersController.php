@@ -63,12 +63,69 @@ class DrummersController
 	}
 
 
+	/**
+	 *
+	 * @update
+	 * PUT /drummers
+	 * @param Request $request
+	 * return mixed
+	 *
+	 */
+	public function update(Request $request, $id)
+	{
+
+		try {
+
+			$drummer = Drummer::findOrFail($id);
+			
+		} catch (ModelNotFoundException $e) {
+			return response()->json([
+					'error' => [
+						'message' => 'Drummer not found'
+					]
+				], 404);
+		}
+		$drummer->fill($request->all());
+		$drummer->save();
+
+		return $drummer;
+	}
+
+	/**
+	 *
+	 * DELETE /drummers/{id}
+	 * @param $id
+	 * @return \Illuminate\Http\JsonResponse
+	 *
+	 */
+	
+	
+	public function destroy($id)
+	{
+			try 
+			{
+				$drummer = Drummer::findOrFail($id);
+			} 
+			catch (	ModelNotFoundException $e) 
+			{
+				return response()->json([
+					'error' => ['message' => 'Drummer not found']
+				 ], 404);
+			}//catch
+
+			$drummer->delete();
+
+			return response(null, 204);
+	}
+
+
+	
+
+
 
 
 
 }
-
-
 
 
 
