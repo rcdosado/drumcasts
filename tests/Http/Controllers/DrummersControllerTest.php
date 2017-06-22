@@ -3,9 +3,13 @@
 namespace Tests\App\Http\Controllers;
 
 use TestCase;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class DrummersControllerTest extends TestCase
 {
+
+    use DatabaseMigrations;
+
     /** @test **/
     public function index_status_code_should_be_200()
     {
@@ -16,14 +20,17 @@ class DrummersControllerTest extends TestCase
     /** @test **/
     public function index_should_return_a_collection_of_records()
     {
-        $this
-            ->get('/drummers')
-            ->seeJson([
-                'firstname' => 'Mike'
-            ])
-            ->seeJson([
-                'firstname' => 'Jacob'
-            ]);
+
+        $drummers = factory('App\Drummer', 2)->create();
+
+        $this->get('/drummers');
+        
+        foreach ($drummers as $drummer) {
+            $this->seeJson(['firstname' => $drummer->firstname]);
+            $this->seeJson(['middlename' => $drummer->middlename]);
+            $this->seeJson(['lastname' => $drummer->lastname]);
+            $this->seeJson(['genre' => $drummer->genre]);
+        }
 
     }
     /**
@@ -32,16 +39,18 @@ class DrummersControllerTest extends TestCase
 
     public function show_should_return_a_valid_drummer()
     {
-        $this->get('/drummers/1')
-            ->seeStatusCode(200)
-            ->seeJson([
-                'id' => 1,
-                'firstname' => 'Mike',
-                'middlename' => 'something',
-                'lastname' => 'Portnoy',
-                'genre' =>'Rock'
-            ]);
 
+        $drummer = factory('App\Drummer')->create();
+        $this->get("/drummers/{$drummer->id}")
+             ->seeStatusCode(200)
+             ->seeJson([
+                    'id' => $drummer->id,
+                    'firstname' => $drummer->firstname,
+                    'middlename' => $drummer->middlename,
+                    'lastname' => $drummer->lastname,
+                    'genre' => $drummer->genre
+                ]);
+                
         $data = json_decode($this->response->getContent(), true);
         $this->assertArrayHasKey('created_at', $data);
         $this->assertArrayHasKey('updated_at', $data);
@@ -126,29 +135,31 @@ class DrummersControllerTest extends TestCase
     public function update_should_only_change_fillable_fields() 
     {
 
-        $this->notSeeInDatabase('drummers', [
-                'lastname' => 'peart'
+        $drummer = factory('App\Drummer')->create([
+                'firstname' => 'Raimund',
+                'middlename' => 'Tayag',
+                'lastname' => 'Mrasigan',
+                'genre' => 'pop'
             ]);
-
-        $this->put('/drummers/1',[
+        $this->put("/drummers/{$drummer->id}",[
                 'id' => 5,
-                'firstname' => 'Neil',
-                'middlename' => 'Ellwood',
-                'lastname' => 'Peart',
-                'genre' => 'Progressive Rock'
+                'firstname' => 'Raimund',
+                'middlename' => 'Gadot',
+                'lastname' => 'Marasigan',
+                'genre' => 'punk rock'
             ]);
-
+            
         $this->seeStatusCode(200)
              ->seeJson([
-                    'id' => 1,
-                    'firstname' => 'Neil',
-                    'middlename' => 'Ellwood',
-                    'lastname' => 'Peart',
-                    'genre' => 'Progressive Rock'
-                ])
-             ->seeInDatabase('drummers',[
-                    'lastname' => 'Peart'
-                ]);
+                'id' => 1 ,
+                'firstname' => 'Raimund',
+                'middlename' => 'Gadot',
+                'lastname' => 'Marasigan',
+                'genre' => 'punk rock'
+            ])
+            ->seeInDatabase('drummers',[
+                 'genre' => 'punk rock'
+            ]);
     }
 
 
@@ -182,12 +193,13 @@ class DrummersControllerTest extends TestCase
      * 
      */
     public function destroy_should_remove_a_valid_drummer() {
+        
+        $drummer = factory('App\Drummer')->create();
+        $this->delete("/drummers/{$drummer->id}")
+             ->seeStatusCode(204)
+             ->isEmpty();
 
-        $this->delete('/drummers/1')
-            ->seeStatusCode(204)
-            ->isEmpty();
-
-        $this->notSeeInDatabase('drummers', ['id'=>1]);
+        $this->notSeeInDatabase('drummers',['id' => $drummer->id]);
     }
 
     /**

@@ -118,18 +118,9 @@ class DrummersController
 			return response(null, 204);
 	}
 
-
-	
-
-
-
-
-
 }
 
 
 
-
-
-
+//page 65
 

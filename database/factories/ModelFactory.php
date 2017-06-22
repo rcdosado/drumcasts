@@ -11,9 +11,14 @@
 |
 */
 
-$factory->define(App\User::class, function ($faker) {
+$factory->define(App\Drummer::class, function ($faker) {
+	$genre = $faker->sentence(rand(1,1))	;
+	$genre = substr($genre, 0, strlen($genre)-1);
+	
     return [
-        'name' => $faker->name,
-        'email' => $faker->email,
+    	'firstname' => $faker->firstname,
+    	'middlename' => $faker->lastname, 
+    	'lastname' => $faker->lastname, 
+    	'genre' => $genre
     ];
 });
