@@ -62,11 +62,12 @@ class DrummersControllerTest extends TestCase
      */
     public function show_should_fail_when_the_drummer_id_does_not_exist() {
 
-        $this->get('/drummers/99999')
+        $this->get('/drummers/99999', ['Accept' => 'application/json'])
             ->seeStatusCode(404)
             ->seeJson([
                 'error' => [
-                    'message' => 'Drummer not found'
+                    'message' => 'Not Found',
+                    'status' => 404
                 ]
             ]);
     }
@@ -169,7 +170,7 @@ class DrummersControllerTest extends TestCase
      */
     public function update_should_fail_with_an_invalid_id() {
 
-      $this->put('/drummers/9999999999')
+      $this->put('/drummers/9999999')
            ->seeStatusCode(404)
            ->seeJsonEquals([
                 'error' => [

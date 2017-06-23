@@ -36,16 +36,7 @@ class DrummersController
 	 */
 	public function show(int $id) {
 
-		try {
-			return Drummer::findOrFail($id);
-		} catch (ModelNotFoundException $e) {
-			
-			return response()->json([
-					'error' => [
-						'message' => 'Drummer not found'
-					]
-				], 404);
-		}
+        return Drummer::findOrFail($id);
 	}
 
 	/**
@@ -116,7 +107,6 @@ class DrummersController
 			$drummer->delete();
 
 			return response(null, 204);
-            
 	}
 
 }
