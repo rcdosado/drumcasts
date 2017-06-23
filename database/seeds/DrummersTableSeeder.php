@@ -4,7 +4,10 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 /**
-* 
+ *  to fill database with new records 
+ *  run phpunit test 
+ *  then `php artisan migrate`
+ *  then `php artisan db:seed`
 */
 class DrummersTableSeeder extends Seeder
 {
@@ -14,24 +17,6 @@ class DrummersTableSeeder extends Seeder
 	*/
 	public	function run()
 	{
-	
-		DB::table('drummers')->insert([
-			'firstname' => 'Mike',
-			'middlename' => 'something',
-			'lastname' => 'Portnoy',
-			'genre' => 'Rock',
-			'created_at' => Carbon::now(),
-			'updated_at' => Carbon::now()
-		]);
-		DB::table('drummers')->insert([
-			'firstname' => 'Jacob',
-			'middlename' => 'something',
-			'lastname' => 'Bacaltos',
-			'genre' => 'Rock',
-			'created_at' => Carbon::now(),
-			'updated_at' => Carbon::now()
-		]);
-
-
+        $drummers = factory('App\Drummer', 25)->create();
 	}
 }

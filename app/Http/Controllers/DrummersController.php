@@ -116,6 +116,7 @@ class DrummersController
 			$drummer->delete();
 
 			return response(null, 204);
+            
 	}
 
 }
