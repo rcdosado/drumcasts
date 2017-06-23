@@ -17,6 +17,6 @@ class DrummersTableSeeder extends Seeder
 	*/
 	public	function run()
 	{
-        $drummers = factory('App\Drummer', 25)->create();
+        $drummers = factory('App\Drummer', 5)->create();
 	}
 }

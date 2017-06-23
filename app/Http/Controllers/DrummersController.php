@@ -25,7 +25,7 @@ class DrummersController
 
 	public function index()
 	{
-		return Drummer::all();
+        return ['data' => Drummer::all()->toArray()];
 	}
 
 
@@ -34,23 +34,30 @@ class DrummersController
 	 * @param int $id
 	 * @return mixed
 	 */
-	public function show(int $id) {
-
-        return Drummer::findOrFail($id);
+    public function show(int $id) 
+    {
+        return [ 'data' => Drummer::findOrFail($id)->toArray()];
 	}
 
 	/**
 	 * store
 	 * POST /drummers
 	 * @param Request $request
-	 * @return \Symfony\Component\HttpFoundation\Response
+  	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function store(Request $request) {
+    public function store(Request $request) 
+    {
+        $drummer = Drummer::create($request->all());
 
-		$drummer = Drummer::create($request->all());	
-		return response()->json(['created' => true], 201, [
-				'Location' => route('drummers.show', ['id'=>$drummer->id])
-		]);
+        return response()->json(
+            [
+                'data' => $drummer->toArray()
+            ],
+            201,
+            [
+                'Location' => route('drummers.show', ['id' => $drummer->id])
+            ]
+       );
 	}
 
 
@@ -64,11 +71,8 @@ class DrummersController
 	 */
 	public function update(Request $request, $id)
 	{
-
 		try {
-
 			$drummer = Drummer::findOrFail($id);
-			
 		} catch (ModelNotFoundException $e) {
 			return response()->json([
 					'error' => [
@@ -79,7 +83,7 @@ class DrummersController
 		$drummer->fill($request->all());
 		$drummer->save();
 
-		return $drummer;
+        return [ 'data' => $drummer->toArray()];
 	}
 
 	/**

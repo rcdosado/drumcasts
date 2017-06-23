@@ -24,14 +24,10 @@ class DrummersControllerTest extends TestCase
         $drummers = factory('App\Drummer', 2)->create();
 
         $this->get('/drummers');
-        
-        foreach ($drummers as $drummer) {
-            $this->seeJson(['firstname' => $drummer->firstname]);
-            $this->seeJson(['middlename' => $drummer->middlename]);
-            $this->seeJson(['lastname' => $drummer->lastname]);
-            $this->seeJson(['genre' => $drummer->genre]);
-        }
-
+        $expected = [
+            'data' => $drummers->toArray()
+        ];
+        $this->seeJsonEquals($expected);
     }
     /**
      * @test
@@ -41,19 +37,12 @@ class DrummersControllerTest extends TestCase
     {
 
         $drummer = factory('App\Drummer')->create();
+        $expected = [
+            'data' => $drummer->toArray()
+        ];
         $this->get("/drummers/{$drummer->id}")
-             ->seeStatusCode(200)
-             ->seeJson([
-                    'id' => $drummer->id,
-                    'firstname' => $drummer->firstname,
-                    'middlename' => $drummer->middlename,
-                    'lastname' => $drummer->lastname,
-                    'genre' => $drummer->genre
-                ]);
-                
-        $data = json_decode($this->response->getContent(), true);
-        $this->assertArrayHasKey('created_at', $data);
-        $this->assertArrayHasKey('updated_at', $data);
+            ->seeStatusCode(200)
+            ->seeJsonEquals($expected);
     }
 
     /**
@@ -97,16 +86,21 @@ class DrummersControllerTest extends TestCase
     {
         $this->post('/drummers',[
                 'firstname' => 'Chris',
-                'middlename' => 'Caballero',   
+                'middlename' => 'Caballero',
                 'lastname' => 'Cole',
                 'genre' => 'electronica'
             ]);
-           
+        $body = json_decode( $this->response->getContent(),true );
+        $this->assertArrayHasKey('data', $body);
 
-            $this->seeJson(['created'=>true])
-                 ->seeInDatabase('drummers', [
-                        'lastname' => 'Cole'
-            ]);
+        $data = $body['data'];
+        $this->assertEquals('Chris', $data['firstname']);
+        $this->assertEquals('Caballero', $data['middlename']);
+        $this->assertEquals('Cole', $data['lastname']);
+        $this->assertEquals('electronica', $data['genre']);
+
+        $this->assertTrue($data['id']>0,'Expected a positive integer,but did not see one.');
+        $this->seeInDatabase('drummers', [ 'lastname' => 'Cole' ]);
     }
 
     /**
@@ -161,6 +155,9 @@ class DrummersControllerTest extends TestCase
             ->seeInDatabase('drummers',[
                  'genre' => 'punk rock'
             ]);
+        //verify the data key in the response 
+        $body = json_decode( $this->response->getContent(),true);
+        $this->assertArrayHasKey('data', $body);
     }
 
 
