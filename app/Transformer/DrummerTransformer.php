@@ -21,8 +21,8 @@ class DrummerTransformer extends TransformerAbstract
             'lastname' => $drummer->lastname,
             'genre' => $drummer->genre,
             'created' => $drummer->created_at->toIso8601String(),
-            'updated' => $drummer->updated_at->toIso8601String(),
-            'published' => $drummer->created_at->diffForHumans()
+            'updated' => $drummer->updated_at->toIso8601String()
+            // 'published' => $drummer->created_at->diffForHumans()
 
         ];
     }

@@ -1,19 +1,12 @@
 <?php
-
-
 namespace App\Http\Controllers;
-
-
-
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-
 
 use App\Drummer;
 use Illuminate\Http\Request;
+use App\Transformer\DrummerTransformer;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-
-
-class DrummersController
+class DrummersController extends Controller
 {
 
 
@@ -25,7 +18,7 @@ class DrummersController
 
 	public function index()
 	{
-        return ['data' => Drummer::all()->toArray()];
+        return $this->collection(Drummer::all(), new DrummerTransformer());
 	}
 
 
@@ -36,7 +29,7 @@ class DrummersController
 	 */
     public function show(int $id) 
     {
-        return [ 'data' => Drummer::findOrFail($id)->toArray()];
+        return $this->item(Drummer::findOrFail($id), new DrummerTransformer);
 	}
 
 	/**
@@ -48,19 +41,12 @@ class DrummersController
     public function store(Request $request) 
     {
         $drummer = Drummer::create($request->all());
+        $data = $this->item($drummer, new DrummerTransformer());
+        return response()->json($data, 201, [
+            'Location' => route('drummers.show', ['id' => $drummer->id])
+        ]);
 
-        return response()->json(
-            [
-                'data' => $drummer->toArray()
-            ],
-            201,
-            [
-                'Location' => route('drummers.show', ['id' => $drummer->id])
-            ]
-       );
 	}
-
-
 	/**
 	 *
 	 * @update
@@ -83,7 +69,7 @@ class DrummersController
 		$drummer->fill($request->all());
 		$drummer->save();
 
-        return [ 'data' => $drummer->toArray()];
+        return $this->item($drummer, new DrummerTransformer());
 	}
 
 	/**
